@@ -74,25 +74,22 @@ function isToday(ts) {
 ========================================================== */
 
 function buildMessage(name, withPartner) {
-    const who = withPartner ? `${name} & Partner` : name;
-
+    // nama tamu belum dipakai di template ini; parameter dibiarkan supaya pemanggilnya tidak berubah
     return `Assalamu'alaikum Warahmatullahi Wabarakatuh.
 
-Dengan memohon rahmat dan ridho Allah SWT, kami bermaksud mengundang Bapak/Ibu/Saudara/i:
 
-*${who}*
+With great joy, we would like to share our wedding invitation with you.
 
-Untuk berkenan hadir dan memberikan doa restu pada acara pernikahan kami.
+We would be truly honored to have you join us on our special day.
 
-Informasi lengkap mengenai acara dapat dilihat melalui tautan undangan berikut:
+Please find the invitation details below:
 
-${BASE_URL}
+\u{1F48C} ${BASE_URL}
 
-Merupakan suatu kehormatan dan kebahagiaan bagi kami apabila Bapak/Ibu/Saudara/i berkenan hadir untuk turut memberikan doa restu.
+Your presence and best wishes would mean so much to us.
 
-Atas perhatian dan kehadirannya, kami mengucapkan terima kasih.
-
-Wassalamu'alaikum Warahmatullahi Wabarakatuh.`;
+Warm regards,
+Agus & Wenna \u{1F90D}`;
 }
 
 function openWhatsApp(guest) {
@@ -103,17 +100,47 @@ function openWhatsApp(guest) {
     window.open(url, "_blank");
 }
 
-// Instagram tidak mendukung isi pesan otomatis: pesan disalin, lalu DM dibuka
+// Instagram tidak mendukung isi pesan otomatis, jadi dibuat lembar 2 langkah:
+// 1) salin pesan  2) buka DM. Link dibuka lewat tombol sendiri supaya tidak diblokir browser.
+let igMessage = "";
+
 function openInstagram(guest) {
-    const url = guest.instagram
+    igMessage = buildMessage(guest.name, guest.partner !== false);
+
+    $("#igMsg").textContent = igMessage;
+    $("#igTo").textContent = guest.instagram ? `Untuk ${guest.name} (@${guest.instagram})` : `Untuk ${guest.name}`;
+    $("#igOpen").href = guest.instagram
         ? `https://ig.me/m/${guest.instagram}`
         : "https://www.instagram.com/direct/inbox/";
-    const copied = copyText(buildMessage(guest.name, guest.partner !== false));
-    window.open(url, "_blank");
-    copied
-        .then(() => toast("Pesan disalin. Tempel di DM Instagram lalu kirim"))
-        .catch(() => toast("Gagal menyalin, gunakan tombol salin pesan"));
+    $("#igShare").hidden = !navigator.share;
+
+    const copyBtn = $("#igCopy");
+    copyBtn.classList.remove("done");
+    copyBtn.textContent = "1. Salin pesan";
+    $("#igSheet").hidden = false;
+
+    // coba salin otomatis; kalau diblokir browser, tombol di atas tetap bisa dipakai
+    copyText(igMessage).then(markCopied).catch(() => {});
 }
+
+function markCopied() {
+    const copyBtn = $("#igCopy");
+    copyBtn.classList.add("done");
+    copyBtn.textContent = "\u2713 Pesan tersalin";
+}
+
+function closeInstagram() { $("#igSheet").hidden = true; }
+
+$("#igCopy").addEventListener("click", () => {
+    copyText(igMessage).then(() => { markCopied(); toast("Pesan disalin"); })
+        .catch(() => toast("Gagal menyalin, tekan lama pada teks pesan lalu salin"));
+});
+$("#igShare").addEventListener("click", () => {
+    navigator.share({ text: igMessage }).catch(() => {});
+});
+$("#igClose").addEventListener("click", closeInstagram);
+$("#igSheet").addEventListener("click", e => { if (e.target.id === "igSheet") closeInstagram(); });
+document.addEventListener("keydown", e => { if (e.key === "Escape") closeInstagram(); });
 
 function openInvite(guest) {
     if (guest.channel === "ig") openInstagram(guest);

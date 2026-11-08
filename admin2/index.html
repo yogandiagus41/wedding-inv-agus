@@ -4,7 +4,7 @@
     <meta charset="UTF-8">
     <meta name="viewport" content="width=device-width, initial-scale=1.0, viewport-fit=cover">
     <meta name="theme-color" content="#5c3a46">
-    <title>Kirim Undangan</title>
+    <title>Kirim Undangan (Keluarga)</title>
 
     <link rel="preconnect" href="https://fonts.googleapis.com">
     <link rel="preconnect" href="https://fonts.gstatic.com" crossorigin>
@@ -18,7 +18,7 @@
         <span class="logo">&hearts;</span>
         <div>
             <h1>Kirim Undangan</h1>
-            <p>Agus &amp; Wenna &middot; 5 Desember 2026</p>
+            <p>Undangan keluarga orang tua &middot; 5 Desember 2026</p>
         </div>
     </div>
 </header>
@@ -57,7 +57,7 @@
             <div class="field" id="fieldIg" hidden>
                 <label for="guestIg">Username Instagram <em>(opsional)</em></label>
                 <input type="text" id="guestIg" placeholder="Contoh: @ags.ndi" autocapitalize="none" autocorrect="off">
-                <small>Instagram tidak bisa mengisi pesan otomatis. Pesan akan disalin, lalu DM tamu terbuka dan Anda tinggal menempel (paste) lalu kirim.</small>
+                <small>Instagram tidak bisa mengisi pesan otomatis. Akan muncul panel untuk menyalin pesan dan membuka DM tamu; Anda tinggal menempel (paste) lalu kirim.</small>
             </div>
 
             <label class="check">
@@ -100,6 +100,21 @@
     </section>
 
 </main>
+
+<!-- LEMBAR KIRIM INSTAGRAM -->
+<div class="sheet" id="igSheet" hidden>
+    <div class="sheet-card" role="dialog" aria-modal="true" aria-labelledby="igTitle">
+        <h3 id="igTitle">Kirim lewat Instagram</h3>
+        <p class="sheet-sub" id="igTo"></p>
+        <div class="bubble" id="igMsg"></div>
+
+        <button type="button" class="btn-send ig" id="igCopy">1. Salin pesan</button>
+        <a class="open-link" id="igOpen" href="#" target="_blank" rel="noopener">2. Buka DM Instagram</a>
+        <button type="button" class="btn-ghost" id="igShare" hidden>Atau bagikan lewat menu HP</button>
+        <button type="button" class="btn-ghost" id="igClose">Tutup</button>
+        <small>Instagram tidak bisa mengisi pesan otomatis. Salin pesan dulu, buka DM, lalu tempel (paste) dan kirim.</small>
+    </div>
+</div>
 
 <div class="toast" id="toast" role="status" aria-live="polite"></div>
 <script src="admin.js"></script>
