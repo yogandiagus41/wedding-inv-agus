@@ -10,7 +10,7 @@ import { mkdir } from "node:fs/promises";
 const SRC = "assets/img";
 const OUT = "assets/img/webp";
 const EXT = "JPG";                    // sesuaikan jika ekstensi foto asli berbeda
-const HERO = new Set([13, 16, 19, 18, 15]);   // foto layar penuh: lebih besar
+const HERO = new Set([14, 10, 19, 18, 15]);  // foto layar penuh: lebih besar
 await mkdir(OUT, { recursive: true });
 
 for (let n = 1; n <= 20; n++) {

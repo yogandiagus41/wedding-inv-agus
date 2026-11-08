@@ -29,13 +29,17 @@ const reduce = matchMedia('(prefers-reduced-motion: reduce)').matches;
 const body = document.body;
 
 /* ===== FOTO: coba WebP dulu, fallback ke file asli ===== */
-function setImg(img, n) {
+function setImg(img, n, hero) {
     const orig = `${CFG.imgDir}${n}.${CFG.imgExt}`;
+    const big = `${CFG.webpDir}${n}.webp`;
+    const small = `${CFG.webpDir}${n}-m.webp`;
     img.decoding = 'async';
-    img.onerror = () => { img.onerror = null; img.src = orig; };
-    img.src = `${CFG.webpDir}${n}.webp`;
+    img.sizes = hero ? '100vw' : '(min-width: 900px) 550px, 100vw';
+    img.onerror = () => { img.onerror = null; img.removeAttribute('srcset'); img.src = orig; };
+    img.srcset = `${small} 800w, ${big} ${hero ? 1600 : 1100}w`;
+    img.src = big;
 }
-$$('.ph img[data-n]').forEach(img => setImg(img, img.dataset.n));
+$$('.ph img[data-n]').forEach(img => setImg(img, img.dataset.n, true));
 
 /* ===== ISI DATA ===== */
 const nm = `${CFG.groomShort}<span class="amp">&amp;</span>${CFG.brideShort}`;
