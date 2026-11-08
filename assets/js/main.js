@@ -12,7 +12,7 @@ const CFG = {
     musicStart: 0,
     imgDir: "assets/img/",          // foto asli (1.JPG ... 20.JPG)
     webpDir: "assets/img/webp/",    // hasil kompres (lihat compress.mjs); kalau belum ada, otomatis pakai foto asli
-    imgExt: "JPG"
+    imgExt: "jpg"
 };
 
 /* Galeri: tiap latar punya foto & susunan baris sendiri.
