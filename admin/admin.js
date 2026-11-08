@@ -120,21 +120,25 @@ if (sendButton) {
 
 
 
-        const message =
+       const message =
 
-            `Assalamu'alaikum Wr. Wb.
+`Assalamu'alaikum Warahmatullahi Wabarakatuh.
 
-Tanpa mengurangi rasa hormat, kami mengundang:
+Dengan memohon rahmat dan ridho Allah SWT, kami bermaksud mengundang Bapak/Ibu/Saudara/i:
 
-*${name} & Partner *
+*${name} & Partner*
 
-untuk hadir pada acara pernikahan kami.
+Untuk berkenan hadir dan memberikan doa restu pada acara pernikahan kami.
 
-Silakan buka undangan:
+Informasi lengkap mengenai acara dapat dilihat melalui tautan undangan berikut:
 
 ${BASE_URL}
 
-Terima kasih.`;
+Merupakan suatu kehormatan dan kebahagiaan bagi kami apabila Bapak/Ibu/Saudara/i berkenan hadir untuk turut memberikan doa restu.
+
+Atas perhatian dan kehadirannya, kami mengucapkan terima kasih.
+
+Wassalamu'alaikum Warahmatullahi Wabarakatuh.`;
 
 
 
