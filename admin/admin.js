@@ -74,10 +74,11 @@ function isToday(ts) {
 ========================================================== */
 
 function buildMessage(name, withPartner) {
-    // nama tamu belum dipakai di template ini; parameter dibiarkan supaya pemanggilnya tidak berubah
+    const who = withPartner ? `${name} & Partner` : name;
+
     return `Assalamu'alaikum Warahmatullahi Wabarakatuh.
 
-
+Dear, ${who}
 With great joy, we would like to share our wedding invitation with you.
 
 We would be truly honored to have you join us on our special day.
