@@ -12,7 +12,7 @@ const CFG = {
     musicStart: 0,
     imgDir: "assets/img/",          // foto asli (1.JPG ... 20.JPG)
     webpDir: "assets/img/webp/",    // hasil kompres (lihat compress.mjs); kalau belum ada, otomatis pakai foto asli
-    imgExt: "jpg"
+    imgExt: "JPG"
 };
 
 /* Galeri: tiap latar punya foto & susunan baris sendiri.
@@ -33,9 +33,14 @@ function setImg(img, n, hero) {
     const orig = `${CFG.imgDir}${n}.${CFG.imgExt}`;
     const big = `${CFG.webpDir}${n}.webp`;
     const small = `${CFG.webpDir}${n}-m.webp`;
+    let step = 0;
     img.decoding = 'async';
     img.sizes = hero ? '100vw' : '(min-width: 900px) 550px, 100vw';
-    img.onerror = () => { img.onerror = null; img.removeAttribute('srcset'); img.src = orig; };
+    img.onerror = () => {
+        step++;
+        if (step === 1) { img.removeAttribute('srcset'); img.src = big; }   // coba webp besar
+        else { img.onerror = null; img.src = orig; }                        // terakhir: foto asli
+    };
     img.srcset = `${small} 800w, ${big} ${hero ? 1600 : 1100}w`;
     img.src = big;
 }

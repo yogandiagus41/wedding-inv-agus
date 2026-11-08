@@ -217,3 +217,28 @@ input.invalid { border-color: var(--danger); box-shadow: 0 0 0 4px rgba(192,57,4
 @media (prefers-reduced-motion: reduce) {
     * { animation: none !important; transition-duration: .01s !important; }
 }
+
+/* ===== PILIHAN KANAL (WhatsApp / Instagram) ===== */
+.channel {
+    display: grid; grid-template-columns: 1fr 1fr; gap: 4px;
+    padding: 4px; margin-bottom: 20px; border-radius: 14px; background: #f3ecea;
+}
+.seg {
+    padding: 11px 10px; border-radius: 11px; font-weight: 500; font-size: .92rem;
+    background: transparent; color: var(--mute);
+    transition: background .25s, color .25s, box-shadow .25s;
+}
+.seg.on { background: #fff; color: var(--plum); box-shadow: 0 6px 14px -8px rgba(92,58,70,.5); }
+[hidden] { display: none !important; }
+
+.btn-send.ig {
+    background: linear-gradient(45deg, #f09433, #dc2743 55%, #bc1888);
+    box-shadow: 0 5px 0 #8f1565, 0 16px 26px -12px rgba(188,24,136,.6);
+}
+.btn-send.ig:active { box-shadow: 0 1px 0 #8f1565; }
+
+.icon-btn.ig { background: #fbe7f1; color: #bc1888; }
+.icon-btn.ig:hover { background: #f6d2e5; }
+
+.via { padding: 1px 9px; border-radius: 999px; font-weight: 500; background: #e7f6dc; color: var(--wa-dark); }
+.via.ig { background: #fbe7f1; color: #bc1888; }

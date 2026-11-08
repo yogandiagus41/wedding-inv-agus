@@ -15,7 +15,7 @@ const BASE_URL = window.location.origin + "/index.html";
 
 const $ = s => document.querySelector(s);
 
-const state = { search: "", group: "all" };
+const state = { search: "", group: "all", channel: "wa" };
 
 function escapeHtml(str) {
     return String(str).replace(/[&<>"']/g, c => (
@@ -48,6 +48,14 @@ function normalizePhone(raw) {
     if (n.startsWith("0")) n = "62" + n.slice(1);
     else if (n.startsWith("8")) n = "62" + n;
     return n.length >= 10 && n.length <= 15 ? n : null;
+}
+
+// @user / user / https://instagram.com/user -> user. Salah format -> null
+function normalizeInsta(raw) {
+    let u = raw.trim();
+    if (!u) return "";
+    u = u.replace(/^https?:\/\/(www\.)?instagram\.com\//i, "").replace(/[/?#].*$/, "").replace(/^@/, "");
+    return /^[A-Za-z0-9._]{1,30}$/.test(u) ? u : null;
 }
 
 function formatDate(ts) {
@@ -95,6 +103,23 @@ function openWhatsApp(guest) {
     window.open(url, "_blank");
 }
 
+// Instagram tidak mendukung isi pesan otomatis: pesan disalin, lalu DM dibuka
+function openInstagram(guest) {
+    const url = guest.instagram
+        ? `https://ig.me/m/${guest.instagram}`
+        : "https://www.instagram.com/direct/inbox/";
+    const copied = copyText(buildMessage(guest.name, guest.partner !== false));
+    window.open(url, "_blank");
+    copied
+        .then(() => toast("Pesan disalin. Tempel di DM Instagram lalu kirim"))
+        .catch(() => toast("Gagal menyalin, gunakan tombol salin pesan"));
+}
+
+function openInvite(guest) {
+    if (guest.channel === "ig") openInstagram(guest);
+    else openWhatsApp(guest);
+}
+
 function copyText(text) {
     if (navigator.clipboard && window.isSecureContext) {
         return navigator.clipboard.writeText(text);
@@ -133,22 +158,45 @@ updatePreview();
 [nameInput, groupInput, phoneInput].forEach(el =>
     el.addEventListener("input", () => el.classList.remove("invalid")));
 
+const igInput = $("#guestIg");
+
+function setChannel(ch) {
+    state.channel = ch;
+    document.querySelectorAll(".seg").forEach(b => {
+        const on = b.dataset.channel === ch;
+        b.classList.toggle("on", on);
+        b.setAttribute("aria-selected", on);
+    });
+    $("#fieldPhone").hidden = ch !== "wa";
+    $("#fieldIg").hidden = ch !== "ig";
+    $("#sendWA").classList.toggle("ig", ch === "ig");
+    $("#sendLabel").textContent = ch === "ig" ? "Salin pesan & buka Instagram" : "Kirim via WhatsApp";
+}
+document.querySelectorAll(".seg").forEach(b => b.addEventListener("click", () => setChannel(b.dataset.channel)));
+
+igInput.addEventListener("input", () => igInput.classList.remove("invalid"));
+
 form.addEventListener("submit", e => {
     e.preventDefault();
 
     const name = nameInput.value.trim();
     const group = groupInput.value.trim();
-    const phone = normalizePhone(phoneInput.value);
+    const channel = state.channel;
+    const phone = channel === "wa" ? normalizePhone(phoneInput.value) : "";
+    const instagram = channel === "ig" ? normalizeInsta(igInput.value) : "";
 
     if (!name) { nameInput.classList.add("invalid"); nameInput.focus(); toast("Nama tamu wajib diisi"); return; }
     if (!group) { groupInput.classList.add("invalid"); groupInput.focus(); toast("Kelompok wajib diisi"); return; }
     if (phone === null) { phoneInput.classList.add("invalid"); phoneInput.focus(); toast("Nomor WhatsApp tidak valid"); return; }
+    if (instagram === null) { igInput.classList.add("invalid"); igInput.focus(); toast("Username Instagram tidak valid"); return; }
 
     const guest = {
         id: Date.now(),
         name,
         group,
+        channel,
         phone,
+        instagram,
         partner: partnerInput.checked,
         status: "sent",
         sent: 1,
@@ -159,16 +207,17 @@ form.addEventListener("submit", e => {
     guests.push(guest);
     saveGuestList(guests);
 
-    openWhatsApp(guest);
+    openInvite(guest);
 
     // kelompok dibiarkan terisi supaya cepat kalau mengundang satu kelompok berturut-turut
     nameInput.value = "";
     phoneInput.value = "";
+    igInput.value = "";
     updatePreview();
     nameInput.focus();
 
     render();
-    toast("Undangan dicatat");
+    if (channel === "wa") toast("Undangan dicatat");
 });
 
 
@@ -229,12 +278,13 @@ function render() {
                 <h3>${escapeHtml(g.name)}</h3>
                 <div class="meta">
                     <span class="tag">${escapeHtml(g.group)}</span>
+                    <span class="via ${g.channel === "ig" ? "ig" : ""}">${g.channel === "ig" ? "Instagram" : "WhatsApp"}</span>
                     <span>${formatDate(g.id)}</span>
                     ${(g.sent || 1) > 1 ? `<span>dikirim ${g.sent}x</span>` : ""}
                 </div>
             </div>
             <div class="actions">
-                <button type="button" class="icon-btn wa" data-action="resend" data-id="${g.id}" title="Kirim ulang" aria-label="Kirim ulang ke ${escapeHtml(g.name)}">
+                <button type="button" class="icon-btn ${g.channel === "ig" ? "ig" : "wa"}" data-action="resend" data-id="${g.id}" title="Kirim ulang" aria-label="Kirim ulang ke ${escapeHtml(g.name)}">
                     <svg viewBox="0 0 24 24" width="18" height="18" fill="none" stroke="currentColor" stroke-width="2" stroke-linecap="round" stroke-linejoin="round"><path d="M22 2 11 13"/><path d="M22 2 15 22l-4-9-9-4 20-7z"/></svg>
                 </button>
                 <button type="button" class="icon-btn" data-action="copy" data-id="${g.id}" title="Salin pesan" aria-label="Salin pesan untuk ${escapeHtml(g.name)}">
@@ -270,7 +320,7 @@ document.addEventListener("click", e => {
     if (btn.dataset.action === "resend") {
         guest.sent = (guest.sent || 1) + 1;
         saveGuestList(guests);
-        openWhatsApp(guest);
+        openInvite(guest);
         render();
     }
 
